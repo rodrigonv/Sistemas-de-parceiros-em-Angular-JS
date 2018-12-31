@@ -1,0 +1,161 @@
+﻿<script>
+    $(document).ready(function () {
+        var options = {
+            onKeyPress: function (cpf, ev, el, op) {
+                var masks = ['000.000.000-000', '00.000.000/0000-00'],
+                    mask = (cpf.length > 14) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.cpfOuCnpj').mask('000.000.000-000', options);
+    });
+</script>
+<section class="content-header" ng-controller="bannerCtrl">
+    <h1>
+        Cadastro de Banner
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Cadastro de Banner</li>
+    </ol>
+    <div class="row no-margin">
+        <button type="button" ng-click="CadastrarBanner()" class="btn btn-info pull-left">Novo banner</button>
+    </div>
+</section>
+<!-- Main content -->
+<section class="content container-fluid">
+    <div class="col-md-12">
+        <div class="box box-widget">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h4>Pesquisar Banner</h4>
+                    <div class="callout callout-danger" ng-show="alerterror">
+                        <h4><i class="icon fa fa-ban"></i> Erro</h4>
+                        {{msgerror}}<br>
+                    </div>
+                    <div class="callout callout-info" ng-show="alertinfo">
+                        <h4><i class="icon fa fa-ban"></i> Informação</h4>
+                        {{msginfo}}
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="form-body">
+                        <div class="form-inline">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="control-label" style="display:block !important;">Nome do banner</label>
+                                    <input type="text" class="form-control" ng-model="banner.nmbanner" my-enter="PesquisarBanner(banner);" placeholder="Nome banner">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" style="display:block !important;">Data início</label>
+                                <div class="input-group date">
+                                    
+                                    <input type="text" class="form-control pull-right" id="datepicker1" ng-model="banner.dtinicio">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" style="display:block !important;">Data fim</label>
+
+                                <div class="input-group date">
+                                    
+                                    <input type="text" class="form-control pull-right" id="datepicker" ng-model="banner.dtfim">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div style="padding-top:15px !important;">
+                                    <button class="btn btn-info pull-left" type="button" ng-click="PesquisarBanner(banner);"><i class="fa fa-search"></i> Pesquisar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="box-header with-border">
+                <h4>Banners</h4>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="">
+                    <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="example2" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="example2_info">
+                                    <thead>
+                                        <tr role="row">
+                                            <th class="col-sm-1">Código</th>
+                                            <th>Nome</th>
+                                            <th class="col-sm-1">Data início</th>
+                                            <th class="col-sm-1">Data fim</th>
+                                            <th class="col-sm-1">Editar</th>
+                                            <th class="col-sm-1">Excluir</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="ban in banners|itemsPerPage:15">
+                                            <td>{{ban.cdbanner}}</td>
+                                            <td>{{ban.nmbanner}}</td>
+                                            <td>{{ban.dtinicio}}</td>
+                                            <td>{{ban.dtfim}}</td>
+                                            <td class="col-sm-1">
+                                                <button type="button" class="btn btn-block btn-info btn-xs" ng-click="EditarBanner(ban)">Editar</button>
+                                            </td>
+                                            <td class="col-sm-1">
+                                                <button type="button" class="btn btn-block btn-danger btn-xs" ng-click="DeleteBanner(ban)">Excluir</button>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div style="padding-left:15px;">
+                                <dir-pagination-controls max-size="10" boundary-links="true"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+
+</section>
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $.fn.datepicker.defaults.language = 'pt-BR';
+        $("#datepicker").inputmask("dd/mm/yyyy", { "placeholder": "dd/mm/yyyy" });
+        $("#datepicker1").inputmask("dd/mm/yyyy", { "placeholder": "dd/mm/yyyy" });
+        //Datemask2 mm/dd/yyyy
+
+        //Date picker
+        $('#datepicker').datepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+
+        $('#datepicker1').datepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+
+
+
+
+    });
+</script>

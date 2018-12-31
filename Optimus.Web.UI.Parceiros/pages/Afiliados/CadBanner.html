@@ -1,0 +1,246 @@
+﻿<script type="text/javascript">
+    function SomenteNumero(e) {
+        var key;
+
+        if (window.event) {
+            key = event.keyCode;
+        }
+        else {
+            key = e.which;
+        }
+
+        if (key > 47 && key < 58 || key == 8 || key == 0) {
+            return;
+        }
+        else {
+            if (window.event) {
+                window.event.returnValue = null;
+            }
+            else {
+                e.preventDefault();
+            }
+        }
+    }
+    function FormataCep(Campo, teclapres) {
+        var tecla = teclapres.keyCode;
+        var vr = new String(Campo.value);
+        vr = vr.replace("-", "");
+        tam = vr.length + 1;
+        if (tecla != 8) {
+            if (tam == 6)
+                Campo.value = vr.substr(0, 5) + '-' + vr.substr(5, 5);
+        }
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $('.date').mask('00/00/0000');
+        $('.time').mask('00:00:00');
+        $('.date_time').mask('00/00/0000 00:00:00');
+        $('.cep').mask('00000000');
+
+        var optionsfone = {
+            onKeyPress: function (fone, ev, el, op) {
+                var masks = ['0000-0000', '00000-0000'],
+                    mask = (fone.length > 9) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.phone').mask('0000-0000', optionsfone);
+        $('.phone9').mask('00000-0000');
+        $('.phone_with_ddd').mask('(00) 0000-0000');
+        $('.phone_us').mask('(000) 000-0000');
+        $('.mixed').mask('AAA 000-S0S');
+        $('.cpf').mask('000.000.000-00', { reverse: true });
+        $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
+        $('.money').mask('000.000.000.000.000,00', { reverse: true });
+        $('.money2').mask("#.##0,00", { reverse: true });
+        $('.ip_address').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+            translation: {
+                'Z': {
+                    pattern: /[0-9]/, optional: true
+                }
+            }
+        });
+        $('.ip_address').mask('099.099.099.099');
+        $('.percent').mask('##0,00%', { reverse: true });
+        $('.clear-if-not-match').mask("00/00/0000", { clearIfNotMatch: true });
+        $('.placeholder').mask("00/00/0000", { placeholder: "__/__/____" });
+        $('.fallback').mask("00r00r0000", {
+            translation: {
+                'r': {
+                    pattern: /[\/]/,
+                    fallback: '/'
+                },
+                placeholder: "__/__/____"
+            }
+        });
+        $('.selectonfocus').mask("00/00/0000", { selectOnFocus: true });
+
+        var options = {
+            onKeyPress: function (cpf, ev, el, op) {
+                var masks = ['000.000.000-000', '00.000.000/0000-00'],
+                    mask = (cpf.length > 14) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.cpfOuCnpj').mask('000.000.000-000', options);
+    });
+
+
+
+
+
+</script>
+<section class="content-header">
+    <h1>
+        Cadastro de banner
+        <!--<small>Optional description</small>-->
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Cadastro de banner</li>
+    </ol>
+</section>
+<!-- Main content -->
+<section class="content container-fluid" ng-controller="bannerCtrl">
+    <div class="col-md-12">
+
+
+        <div class="box">
+            <div class="box-header with-border">
+                <h4>Banner id {{cdbanner}}</h4>
+                <div class="callout callout-danger" ng-show="alerterror">
+                    <h4><i class="icon fa fa-ban"></i> Erro</h4>
+                    {{msgerror}}<br>
+                    <ul>
+                        <li ng-repeat="err in msgerros">
+                            {{err}}
+                        </li>
+                    </ul>
+                </div>
+                <div class="callout callout-info" ng-show="alertinfo">
+                    <h4><i class="icon fa fa-ban"></i> Informação</h4>
+                    {{msginfo}}
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="form-body" id="data-client">
+
+                    <!--<div class="alert alert-danger display-hide">
+                        <button class="close" data-close="alert"></button>
+                        Campos obrigatórios não foram preenchidos.
+                    </div>-->
+
+                    <form name="formcadcli" ng-submit="GravarBanner(banner)">
+                        <input type="hidden" ng-model="banner.cdbanner" />
+                        <div class="row no-margin">
+                            <div class="row nomargin">
+                                <div class="col-lg-12 field">
+                                    <div class="form-group">
+                                        <label>
+                                            Nome do banner:
+                                        </label>
+                                        <input type="text" id="nmbanner" class="form-control required" ng-model="banner.nmbanner" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nomargin">
+                                <div class="col-lg-12 field">
+                                    <div class="form-group">
+                                        <label>
+                                            Url da imagen:
+                                        </label>
+                                        <input type="text" id="nmbanner" class="form-control required" ng-model="banner.txurlimagem" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nomargin">
+                                <div class="col-lg-12 field">
+                                    <div class="form-group">
+                                        <label>
+                                            Link da promoção:
+                                        </label>
+                                        <input type="text" id="nmbanner" class="form-control required" ng-model="banner.txurlredirect" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-margin">
+                                <div class="col-lg-12">
+                                    <div class="row no-margin">
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <label class="control-label" style="display:block !important;">Data início</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control pull-right" id="datepicker1" ng-model="banner.dtinicio" style="width:100px;">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label" style="display:block !important;">Data fim</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control pull-right" id="datepicker" ng-model="banner.dtfim" style="width:100px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-margin" style="margin-top:20px;">
+                                <div class="form-group">
+                                    <label>
+                                        Está ativo?
+                                    </label>
+                                    <input ng-model="banner.stativo" type="checkbox" id="item-" ng-checked="banner.stativo == 1">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:20px;">
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2 left">
+                                <button type="submit" class="btn btn-block btn-success btn-lg">Salvar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+
+</section>
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $.fn.datepicker.defaults.language = 'pt-BR';
+        $("#datepicker").inputmask("dd/mm/yyyy", { "placeholder": "dd/mm/yyyy" });
+        $("#datepicker1").inputmask("dd/mm/yyyy", { "placeholder": "dd/mm/yyyy" });
+        //Datemask2 mm/dd/yyyy
+
+        //Date picker
+        $('#datepicker').datepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+
+        $('#datepicker1').datepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+
+
+
+
+    });
+</script>

@@ -1,0 +1,164 @@
+﻿<script>
+    $(document).ready(function () {
+        var options = {
+            onKeyPress: function (cpf, ev, el, op) {
+                var masks = ['000.000.000-000', '00.000.000/0000-00'],
+                    mask = (cpf.length > 14) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.cpfOuCnpj').mask('000.000.000-000', options);
+    });
+</script>
+<section class="content-header" ng-controller="EnviaNFCtrl" ng-init="iniciarParceiro()">
+    <h1>
+        Enviar nota fiscal
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Enviar nota fiscal</li>
+    </ol>
+
+</section>
+<!-- Main content -->
+<section class="content container-fluid">
+    <div class="col-md-12">
+        <div class="box box-widget">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h4>Selecionar arquivo</h4>
+                    <div class="callout callout-danger" ng-show="alerterror">
+                        <h4><i class="icon fa fa-ban"></i> Erro</h4>
+                        {{msgerror}}<br>
+                    </div>
+                    <div class="callout callout-info" ng-show="alertinfo">
+                        <h4><i class="icon fa fa-ban"></i> Informação</h4>
+                        {{msginfo}}
+                    </div>
+                </div>
+                <div class="box-body">
+                    <form name="formnfe" role="form" enctype="multipart/form-data">
+                        <input type="hidden" ng-model="arquivo.Cdfornecedor" value="0" />
+                        <div class="form-group">
+                            <label for="newPhotos">Arquivo</label>
+                            <input type="file" id="newPhotos" class="uploadFile" accept="*.pdf" ngf-select ng-model="files" ngf-multiple="false">
+                            <i ng-show="formnfe.file.$error.required">*Obrigatório</i>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" style="display:block !important;">Descrição</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control pull-right" ng-model="arquivo.txinfo" style="width:600px;">
+                                <input type="hidden" ng-model="arquivo.cdforn">
+                            </div>
+
+                        </div>
+                        <button type="button" class="btn btn-primary" ng-click="uploadFiles(files,arquivo);" style="width:130px;">Enviar arquivo<i class="fa fa-fw fa-edit"></i></button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="box-header with-border">
+                <h4>Notas fiscais</h4>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="form-inline">
+                    <div class="form-group" ng-show="ehAdm()">
+                        <label class="control-label" style="display:block !important;">Parceiro</label>
+                        <select ng-model="pesq.cdparceiro" class="form-control" ng-options="parc.cdparceiro as parc.nmparceiro for parc in parceiros"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="display:block !important;">Data início</label>
+                        <div class="input-group date">
+                            <input type="text" class="form-control pull-right" id="datepicker1" ng-model="pesq.dtinicio">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="display:block !important;">Data fim</label>
+                        <div class="input-group date">
+                            
+                            <input type="text" class="form-control pull-right" id="datepicker" ng-model="pesq.dtfim">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div style="padding-top:15px !important;">
+                            <button class="btn btn-info pull-left" type="button" ng-click="PesquisaNfe(pesq);"><i class="fa fa-search"></i> Pesquisar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="example2" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="example2_info">
+                                    <thead>
+                                        <tr role="row">
+                                            <th class="col-sm-1">Código</th>
+                                            <th>Parceiro</th>
+                                            <th>Descrição</th>
+                                            <th class="col-sm-1">Data</th>
+                                            <th class="col-sm-1">Arquivo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="nf in nfes|itemsPerPage:15">
+                                            <td>{{nf.CdUploadParceiro}}</td>
+                                            <td>{{nf.nmfornecedor}}</td>
+                                            <td>{{nf.txinfo}}</td>
+                                            <td>{{nf.dtinclusao}}</td>
+                                            <td class="col-sm-1">
+                                                <button type="button" class="btn btn-block btn-info btn-xs" ng-click="AbrirArquivo(nf.txpath)">Abrir</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div style="padding-left:15px;">
+                                <dir-pagination-controls max-size="10" boundary-links="true"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+
+</section>
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $.fn.datepicker.defaults.language = 'pt-BR';
+        $("#datepicker").inputmask("dd/mm/yyyy", { "placeholder": "dd/mm/yyyy" });
+        $("#datepicker1").inputmask("dd/mm/yyyy", { "placeholder": "dd/mm/yyyy" });
+        //Datemask2 mm/dd/yyyy
+
+        //Date picker
+        $('#datepicker').datepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+
+        $('#datepicker1').datepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+
+
+
+
+    });
+</script>

@@ -1,0 +1,75 @@
+﻿<section class="content-header">
+    <h1>
+        Dashboard
+        <!--<small>Optional description</small>-->
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+</section>
+<!-- Main content -->
+<section class="content container-fluid" ng-controller="mainCtrl" ng-init="load()">
+    <div class="col-md-12">
+        <div class="box box-widget">
+            <div class="box-body">
+                <div class="col-lg-12">
+
+                    <carousel interval="myInterval">
+                        <slide ng-repeat="ban in banners">
+                            <img ng-src="{{ban.txurlimagem}}">
+
+                        </slide>
+                    </carousel>
+
+                    <!-- <section class="slider">
+                        <div div="slider" class="flexslider carousel">
+                            <ul class="slides">
+                                <li ng-repeat="ban in banners">
+                                    <img src="{{ban.txurlimagem}}" alt="" />
+                                </li>
+                            </ul>
+                        </div>
+                    </section> -->
+                    <div class="col-lg-12">
+                        <div class="marcas">
+                            <ul class="slides">
+                                <li ng-repeat="mac in slides">
+                                    <a href="{{mac.link}}" target="_blank">
+                                        <img src="{{mac.image}}" alt="" />
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //    $('.flexslider').flexslider({
+        //        animation: "slide"
+        //    });
+        //    $('.carousel').carousel();
+        //    $('#slider').flexslider({
+        //        animation: "slide",
+        //        controlNav: false,
+        //        animationLoop: false,
+        //        slideshow: false,
+        //        sync: "#carousel"
+        //    });
+        //});
+        $('.marcas').flexslider({
+            animation: "slide",
+            animationLoop: true,
+            itemWidth: 84,
+            itemMargin: 2,
+            minItems: 2,
+            maxItems: 6,
+            controlNav: true,
+            slideshow: true
+        });
+    });
+</script>

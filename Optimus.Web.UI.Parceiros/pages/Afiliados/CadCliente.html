@@ -1,0 +1,668 @@
+﻿<script type="text/javascript">
+    function SomenteNumero(e) {
+        var key;
+
+        if (window.event) {
+            key = event.keyCode;
+        }
+        else {
+            key = e.which;
+        }
+
+        if (key > 47 && key < 58 || key == 8 || key == 0) {
+            return;
+        }
+        else {
+            if (window.event) {
+                window.event.returnValue = null;
+            }
+            else {
+                e.preventDefault();
+            }
+        }
+    }
+    function FormataCep(Campo, teclapres) {
+        var tecla = teclapres.keyCode;
+        var vr = new String(Campo.value);
+        vr = vr.replace("-", "");
+        tam = vr.length + 1;
+        if (tecla != 8) {
+            if (tam == 6)
+                Campo.value = vr.substr(0, 5) + '-' + vr.substr(5, 5);
+        }
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $('.date').mask('00/00/0000');
+        $('.time').mask('00:00:00');
+        $('.date_time').mask('00/00/0000 00:00:00');
+        $('.cep').mask('00000000');
+
+        var optionsfone = {
+            onKeyPress: function (fone, ev, el, op) {
+                var masks = ['0000-0000', '00000-0000'],
+                    mask = (fone.length > 9) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.phone').mask('0000-0000', optionsfone);
+        $('.phone9').mask('00000-0000');
+        $('.phone_with_ddd').mask('(00) 0000-0000');
+        $('.phone_us').mask('(000) 000-0000');
+        $('.mixed').mask('AAA 000-S0S');
+        $('.cpf').mask('000.000.000-00', { reverse: true });
+        $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
+        $('.money').mask('000.000.000.000.000,00', { reverse: true });
+        $('.money2').mask("#.##0,00", { reverse: true });
+        $('.ip_address').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+            translation: {
+                'Z': {
+                    pattern: /[0-9]/, optional: true
+                }
+            }
+        });
+        $('.ip_address').mask('099.099.099.099');
+        $('.percent').mask('##0,00%', { reverse: true });
+        $('.clear-if-not-match').mask("00/00/0000", { clearIfNotMatch: true });
+        $('.placeholder').mask("00/00/0000", { placeholder: "__/__/____" });
+        $('.fallback').mask("00r00r0000", {
+            translation: {
+                'r': {
+                    pattern: /[\/]/,
+                    fallback: '/'
+                },
+                placeholder: "__/__/____"
+            }
+        });
+        $('.selectonfocus').mask("00/00/0000", { selectOnFocus: true });
+
+        var options = {
+            onKeyPress: function (cpf, ev, el, op) {
+                var masks = ['000.000.000-000', '00.000.000/0000-00'],
+                    mask = (cpf.length > 14) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.cpfOuCnpj').mask('000.000.000-000', options);
+    });
+
+
+
+
+
+</script>
+<section class="content-header">
+    <h1>
+        Cliente
+        <!--<small>Optional description</small>-->
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Cliente</li>
+    </ol>
+</section>
+<!-- Main content -->
+<section class="content container-fluid" ng-controller="clienteCadastroCtrl" ng-init="LoadBasicos()">
+    <div class="col-md-12">
+
+
+        <div class="box">
+            <div class="box-header with-border">
+                <h4>Dados do cliente {{cdentidade}}</h4>
+                <div class="callout callout-danger" ng-show="alerterror">
+                    <h4><i class="icon fa fa-ban"></i> Erro</h4>
+                    {{msgerror}}<br>
+                    <ul>
+                        <li ng-repeat="err in msgerros">
+                            {{err}}
+                        </li>
+                    </ul>
+                </div>
+                <div class="callout callout-info" ng-show="alertinfo">
+                    <h4><i class="icon fa fa-ban"></i> Informação</h4>
+                    {{msginfo}}
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="form-body" id="data-client">
+
+                    <!--<div class="alert alert-danger display-hide">
+                        <button class="close" data-close="alert"></button>
+                        Campos obrigatórios não foram preenchidos.
+                    </div>-->
+
+                    <form name="formcadcli" ng-submit="GravarCliente(cli)">
+
+                        <div class="row">
+                            <input type="hidden" ng-model="cli.cdentidade" />
+                            <div class="col-xs-12">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label for="CPFCNPJ">Tipo pessoa:</label>
+                                        <div style="display: inline-block;padding:3px;">
+                                            <input type="radio" name="tipopessoa" ng-model="cli.tipopessoa" value="F" ng-checked="cli.tipopessoa=='F'" ng-click="SelecionarTipoPessoa()" />Física
+                                            <input type="radio" name="tipopessoa" ng-model="cli.tipopessoa" value="J" ng-checked="cli.tipopessoa=='J'" ng-click="SelecionarTipoPessoa()" />Júridica
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row no-margin">
+                            <div class="row nomargin">
+                                <div class="col-lg-4 field">
+                                    <div class="form-group">
+                                        <label>
+                                            Nome/Razão Social: (*)
+                                        </label>
+                                        <input type="text" id="txtRazaoSocial" class="form-control required" ng-model="cli.nome" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 field" ng-show="cli.tipopessoa =='J'">
+                                    <div class="form-group">
+                                        <label>
+                                            Nome Fantasia:
+                                        </label>
+                                        <input class="form-control" type="text" id="txtNomeFantasia" ng-model="cli.fantasia">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 field" ng-show="cli.tipopessoa =='F'">
+                                    <div class="form-group">
+                                        <label for="Sexo">Sexo</label>
+                                        <div>
+                                            <input type="radio" name="Sexo" ng-model="cli.sexo" value="M" ng-checked="cli.sexo=='M' " />Masculino
+                                            <input type="radio" name="Sexo" ng-model="cli.sexo" value="F" ng-checked="cli.sexo=='F'" />Feminino
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nomargin">
+                                <div class="col-lg-4 field" ng-show="cli.tipopessoa =='J'">
+                                    <div class="form-group">
+                                        <label for="txtCNPJ">CNPJ (*)</label>
+                                        <div class="input-group">
+                                            <input type="text" id="txtCNPJ" class="form-control required cnpj" placeholder="CPF / CNPJ" data-msg-required="Informe o CNPJ" ng-model="cli.CNPJ" ng-blur="VerificarcpfcnpjCliente(cli.CNPJ);" />
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-info btn-flat" ng-click="VerificarcpfcnpjCliente(cli.CNPJ);"><i class="fa fa-fw fa-check"></i></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 field" ng-show="cli.tipopessoa =='F'">
+                                    <div class="form-group">
+                                        <label for="txtCNPJ">CPF (*)</label>
+                                        <div class="input-group">
+                                            <input type="text" id="txtCNPJ" class="form-control required cpf" placeholder="CPF / CNPJ" data-msg-required="Informe o CPF" ng-model="cli.CPF" ng-blur="VerificarcpfcnpjCliente(cli.CNPJ);" />
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-info btn-flat" ng-click="VerificarcpfcnpjCliente(cli.CPF);"><i class="fa fa-fw fa-check"></i></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 field">
+                                    <div class="form-group">
+                                        <label for="txtIEIM">IE(*)</label>
+                                        <input type="text" id="txtIEIM" class="form-control number" onkeypress="javascript:SomenteNumero(event);" ng-model="cli.IE" />
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="row nomargin">
+                                <div class="col-lg-4 field" ng-show="cli.tipopessoa =='F'">
+                                    <div class="form-group">
+                                        <label for="txtIEIM">Identidade(*)</label>
+                                        <input type="text" id="txtIEIM" class="form-control number" ng-model="cli.identidade">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 field" ng-show="cli.tipopessoa =='J'">
+                                    <div class="form-group">
+                                        <label for="txtIEIM">IM(*)</label>
+                                        <input type="text" id="txtIEIM" class="form-control number" onkeypress="javascript:SomenteNumero(event);" ng-model="cli.IM">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <fieldset id="endereco">
+                                <legend style="font-size: 18px;">Endereços</legend>
+                                <div class="row nomargin">
+                                    <div class="col-lg-4 field">
+                                        <label>
+                                            Cep: (*)
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="hidden" ng-model="ende.idx" />
+                                            <input type="hidden" ng-model="ende.cdendereco" />
+                                            <input type="hidden" ng-model="ende.cdmunicipioibge" />
+                                            <input type="hidden" ng-model="ende.excluir" />
+                                            <input type="text" class="form-control cep" ng-model="ende.CEP" onkeypress="javascript:SomenteNumero(event);" my-enter="PesquisarCep(ende.CEP);">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-info btn-flat" ng-click="PesquisarCep(ende.CEP);"><i class="fa fa-fw fa-search"></i></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 field">
+                                        <div class="form-group">
+                                            <label>
+                                                UF: (*)
+                                            </label>
+                                            <select name="UF" ng-model="ende.UF" class="form-control" style="width:80px;">
+                                                <option ng-repeat="item in states" value="{{item}}">{{item}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Cidade: (*)
+                                            </label>
+                                            <input type="text" id="txtCidade" class="form-control required cidade" ng-model="ende.cidade" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Tipo endereço:
+                                            </label>
+                                            <select name="tipoendereco" id="tipoendereco" class="form-control required" ng-model="ende.cdtipoendereco">
+                                                <option ng-repeat="item in TiposEndereco" value="{{item.valor}}">{{item.nome}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4 field">
+                                        <div class="form-group">
+                                            <label>Logradouro: (*)</label>
+                                            <input type="text" id="txtLogradouro" class="form-control required logradouro" ng-model="ende.logradouro" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Número: (*)
+                                            </label>
+                                            <input type="text" id="txtNumero" class="form-control" ng-model="ende.numero" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Bairro: (*)
+                                            </label>
+                                            <input class="form-control required bairro form-control" type="text" id="txtBairro" ng-model="ende.bairro" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Complemento:
+                                            </label>
+                                            <input class="form-control" type="text" id="txtComplemento" ng-model="ende.complemento" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Referencia:
+                                            </label>
+                                            <input class="form-control" type="text" id="txtComplemento" ng-model="ende.referencia" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 field">
+                                        <div class="form-group">
+                                            <label>
+                                                End. Principal?
+                                            </label>
+                                            <select name="EnderecoPrincipal" id="EnderecoPrincipal" ng-model="ende.principal" class="form-control required" style="width:80px;">
+                                                <option value="1" selected>Sim</option>
+                                                <option value="0">Não</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row nomargin">
+                                    <div class="col-lg-2" style="padding-bottom:10px;">
+                                        <button type="button" class="btn btn-block btn-success btn-sm" ng-click="SalvarEndereco(ende);" style="width:130px;">Salvar endereço<i class=" fa fa-fw fa-server"></i></button>
+
+                                    </div>
+                                    <div class="col-lg-2" style="padding-bottom:10px;">
+                                        <button type="button" class="btn btn-block btn-primary btn-sm" ng-click="LimparEndereco();" style="width:130px;">Adicionar endereço<i class=" fa fa-fw fa-edit"></i></button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!-- grid de enderecos -->
+                                    <div class="col-lg-12 field">
+                                        <div id="no-more-tables">
+                                            <table id="example2" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="example2_info">
+                                                <thead>
+                                                    <tr role="row">
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>Tipo</th>
+                                                        <th>CEP</th>
+                                                        <th>UF</th>
+                                                        <th>Cidade</th>
+                                                        <th>Bairro</th>
+                                                        <th>Principal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr dir-paginate="e in enderecos|filter:{excluir:0}|itemsPerPage:5 track by $index" pagination-id="endePagination" ng-class="e.cdendereco == cdenderecosel ?'trselect':''">
+                                                        <td class="col-sm-1"><button type="button" class="btn btn-block btn-primary btn-xs" style="width:60px;" ng-click="EditarEndereco(e,$index,0)">Editar<i class="fa fa-fw fa-edit"></i></button></td>
+                                                        <td class="col-sm-1"><button type="button" class="btn btn-block btn-danger btn-xs" style="width:60px;" ng-click="EditarEndereco(e,$index,1)">Excluir<i class="fa fa-fw fa-trash"></i></button></td>
+                                                        <td data-title="Tipo">{{getTipoEndereco(e.cdtipoendereco)}} </td>
+                                                        <td data-title="CEP">{{e.CEP}}</td>
+                                                        <td data-title="UF">{{e.UF}}</td>
+                                                        <td data-title="Cidade">{{e.cidade}}</td>
+                                                        <td data-title="Bairro">{{e.bairro}}</td>
+                                                        <td data-title="Principal">{{getEnderecoPrincipal(e.principal)}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div>
+                                                <dir-pagination-controls max-size="10" boundary-links="true" pagination-id="endePagination"></dir-pagination-controls>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row nomargin">
+                                    <hr />
+                                </div>
+                            </fieldset>
+
+                            <fieldset id="contato">
+                                <legend style="font-size: 18px;">Contato</legend>
+                                <div class="row nomargin">
+                                    <div class="col-lg-2 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Tipo contato:
+                                            </label>
+                                            <input type="hidden" ng-model="contato.idx" />
+                                            <input type="hidden" ng-model="contato.cdcontato" />
+                                            <input type="hidden" ng-model="contato.cdtelefoneresi" />
+                                            <input type="hidden" ng-model="contato.cdtelefonecel" />
+                                            <input type="hidden" ng-model="contato.cdemail" />
+                                            <select name="tipocontato" id="tipocontato" class="form-control required" ng-model="contato.cdtipocontato">
+                                                <option ng-repeat="item in TiposContato" value="{{item.valor}}">{{item.nome}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Principal:
+                                            </label>
+                                            <select name="stdefault" id="stdefault" class="form-control required" ng-model="contato.stdefault" style="width:80px;">
+                                                <option value="1">Sim</option>
+                                                <option value="0">Não</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Nome: (*)
+                                            </label>
+                                            <input type="text" id="contatonome" class="form-control required nome" ng-model="contato.nome" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 field">
+                                        <div class="form-group">
+                                            <label>Apelido: (*)</label>
+                                            <input type="text" id="txtLogradouro" class="form-control required logradouro" ng-model="contato.apelido" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row nomargin">
+                                    <div class="col-lg-1 field">
+                                        <div class="form-group">
+                                            <label>
+                                                DDD:
+                                            </label>
+                                            <select name="ddd" id="ddd" class="form-control required" ng-model="contato.dddresi" style="width:70px;">
+                                                <option selected="selected" value=""></option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="24">24</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="31">31</option>
+                                                <option value="32">32</option>
+                                                <option value="33">33</option>
+                                                <option value="34">34</option>
+                                                <option value="35">35</option>
+                                                <option value="37">37</option>
+                                                <option value="38">38</option>
+                                                <option value="41">41</option>
+                                                <option value="42">42</option>
+                                                <option value="43">43</option>
+                                                <option value="44">44</option>
+                                                <option value="45">45</option>
+                                                <option value="46">46</option>
+                                                <option value="47">47</option>
+                                                <option value="48">48</option>
+                                                <option value="49">49</option>
+                                                <option value="51">51</option>
+                                                <option value="53">53</option>
+                                                <option value="54">54</option>
+                                                <option value="55">55</option>
+                                                <option value="61">61</option>
+                                                <option value="62">62</option>
+                                                <option value="63">63</option>
+                                                <option value="64">64</option>
+                                                <option value="65">65</option>
+                                                <option value="67">67</option>
+                                                <option value="68">68</option>
+                                                <option value="69">69</option>
+                                                <option value="71">71</option>
+                                                <option value="73">73</option>
+                                                <option value="74">74</option>
+                                                <option value="75">75</option>
+                                                <option value="77">77</option>
+                                                <option value="79">79</option>
+                                                <option value="81">81</option>
+                                                <option value="82">82</option>
+                                                <option value="83">83</option>
+                                                <option value="84">84</option>
+                                                <option value="85">85</option>
+                                                <option value="86">86</option>
+                                                <option value="87">87</option>
+                                                <option value="88">88</option>
+                                                <option value="89">89</option>
+                                                <option value="91">91</option>
+                                                <option value="92">92</option>
+                                                <option value="93">93</option>
+                                                <option value="94">94</option>
+                                                <option value="95">95</option>
+                                                <option value="96">96</option>
+                                                <option value="97">97</option>
+                                                <option value="98">98</option>
+                                                <option value="99">99</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 field">
+                                        <div class="form-group">
+                                            <label>Telefone residencial (*)</label>
+                                            <input type="text" id="telresidencial" class="form-control required phone" ng-model="contato.telresidencial" style="width:118px;" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 field">
+                                        <div class="form-group">
+                                            <label>
+                                                DDD:
+                                            </label>
+                                            <select name="ddd" id="ddd" class="form-control required" ng-model="contato.dddcel" style="width:70px;">
+                                                <option selected="selected" value=""></option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="24">24</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="31">31</option>
+                                                <option value="32">32</option>
+                                                <option value="33">33</option>
+                                                <option value="34">34</option>
+                                                <option value="35">35</option>
+                                                <option value="37">37</option>
+                                                <option value="38">38</option>
+                                                <option value="41">41</option>
+                                                <option value="42">42</option>
+                                                <option value="43">43</option>
+                                                <option value="44">44</option>
+                                                <option value="45">45</option>
+                                                <option value="46">46</option>
+                                                <option value="47">47</option>
+                                                <option value="48">48</option>
+                                                <option value="49">49</option>
+                                                <option value="51">51</option>
+                                                <option value="53">53</option>
+                                                <option value="54">54</option>
+                                                <option value="55">55</option>
+                                                <option value="61">61</option>
+                                                <option value="62">62</option>
+                                                <option value="63">63</option>
+                                                <option value="64">64</option>
+                                                <option value="65">65</option>
+                                                <option value="67">67</option>
+                                                <option value="68">68</option>
+                                                <option value="69">69</option>
+                                                <option value="71">71</option>
+                                                <option value="73">73</option>
+                                                <option value="74">74</option>
+                                                <option value="75">75</option>
+                                                <option value="77">77</option>
+                                                <option value="79">79</option>
+                                                <option value="81">81</option>
+                                                <option value="82">82</option>
+                                                <option value="83">83</option>
+                                                <option value="84">84</option>
+                                                <option value="85">85</option>
+                                                <option value="86">86</option>
+                                                <option value="87">87</option>
+                                                <option value="88">88</option>
+                                                <option value="89">89</option>
+                                                <option value="91">91</option>
+                                                <option value="92">92</option>
+                                                <option value="93">93</option>
+                                                <option value="94">94</option>
+                                                <option value="95">95</option>
+                                                <option value="96">96</option>
+                                                <option value="97">97</option>
+                                                <option value="98">98</option>
+                                                <option value="99">99</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 field">
+                                        <div class="form-group">
+                                            <label>Telefone celular (*)</label>
+                                            <input type="text" id="telresidencial" class="form-control required phone9" ng-model="contato.telcelular" style="width:118px;" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 field">
+                                        <div class="form-group">
+                                            <label>E-mail (*)</label>
+                                            <input type="text" id="email" class="form-control required" ng-model="contato.email" style="width:300px;" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row nomargin">
+                                    <div class="col-lg-10 field">
+                                        <div class="form-group">
+                                            <label>
+                                                Observaçao: (*)
+                                            </label>
+                                            <input class="form-control required bairro form-control" type="text" id="contatoobervacao" ng-model="contato.observacao" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row nomargin">
+                                    <div class="col-lg-2" style="padding-bottom:10px;">
+                                        <button type="button" class="btn btn-block btn-success btn-sm" ng-click="SalvarContato(contato);" style="width:130px;">Salvar contato<i class="fa fa-fw fa-user-plus"></i></button>
+                                    </div>
+                                    <div class="col-lg-2" style="padding-bottom:10px;">
+                                        <button type="button" class="btn btn-block btn-primary btn-sm" ng-click="LimparContato();" style="width:130px;">Adicionar contato<i class="fa fa-fw fa-edit"></i></button>
+                                    </div>
+                                </div>
+                                <div class="row nomargin">
+                                    <div class="col-lg-12 field">
+                                        <div id="no-more-tables">
+
+
+                                            <table id="example2" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="example2_info">
+                                                <thead>
+                                                    <tr role="row">
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>Tipo</th>
+                                                        <th>Nome</th>
+                                                        <th>Apelido</th>
+                                                        <th>Pricipal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr dir-paginate="cont in contatos|filter:{excluir:0}|itemsPerPage:3 track by $index" pagination-id="contatoPagination" ng-class="cont.cdcontato == cdcontatoselecionado ?'trselect':''">
+                                                        <td class="col-sm-1"><button type="button" class="btn btn-block btn-primary btn-xs" style="width:60px;" ng-click="EditarContato($index,cont)">Editar<i class="fa fa-fw fa-edit"></i></button></td>
+                                                        <td class="col-sm-1"><button type="button" class="btn btn-block btn-danger btn-xs" style="width:60px;" ng-click="ExcluirContato(cont,$index)">Excluir<i class="fa fa-fw fa-trash"></i></button></td>
+                                                        <td data-title="Tipo">{{getTipoContato(cont.cdtipocontato)}}</td>
+                                                        <td data-title="Nome">{{cont.nome}}</td>
+                                                        <td data-title="Apelido"> {{cont.apelido}}</td>
+                                                        <td data-title="Pricipal">{{getEnderecoPrincipal(cont.stdefault)}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div>
+                                            <dir-pagination-controls max-size="10" boundary-links="true" pagination-id="contatoPagination"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row nomargin">
+                                    <hr />
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        <div class="row no-margin">
+                            <div class="col-lg-2 left">
+                                <button type="submit" class="btn btn-block btn-success btn-lg">Salvar cliente</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+
+</section>
