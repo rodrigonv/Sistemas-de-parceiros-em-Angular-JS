@@ -1,0 +1,28 @@
+﻿<div class="row" ng-controller="authCtrl">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <div class="callout callout-danger" ng-show="alertloginerror">
+            <h4><i class="icon fa fa-ban"></i>ERRO</h4>
+            {{errologin}}
+        </div>
+        <div class="login-box-body">
+            <p class="login-box-msg">Informe seu usuário e senha para iniciar</p>
+            <form method="post" ng-submit="Logar(user.usuario,user.senha)">
+                <div class="form-group has-feedback">
+                    <input type="text" class="form-control" placeholder="Usuário" ng-model="user.usuario">
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="password" class="form-control" placeholder="Senha" ng-model="user.senha">
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>

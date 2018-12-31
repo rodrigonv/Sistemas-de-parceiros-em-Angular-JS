@@ -1,0 +1,100 @@
+﻿<script>
+    $(document).ready(function () {
+        var options = {
+            onKeyPress: function (cpf, ev, el, op) {
+                var masks = ['000.000.000-000', '00.000.000/0000-00'],
+                    mask = (cpf.length > 14) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.cpfOuCnpj').mask('000.000.000-000', options);
+    });
+</script>
+<section class="content-header" ng-controller="colaboradorCtrl">
+    <h1>
+        Colaborador
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Colaborador</li>
+    </ol>
+    <div class="row no-margin">
+        <button type="button" ng-click="NovoColaborador()" class="btn btn-info pull-left">Novo colaborador</button>
+    </div>
+</section>
+<!-- Main content -->
+<section class="content container-fluid">
+    <div class="col-md-12">
+        <div class="box box-widget">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h4>Pesquisar cliente</h4>
+                </div>
+                <div class="box-body">
+                    <div class="form-body">
+                        <div class="form-group">
+
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" ng-model="colaborador.emailColaborador" placeholder="E-mail do colaborador">
+                            </div>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" ng-model="colaborador.nomeColaborador" placeholder="Nome do colaborador">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" ng-click="PesquisarColoborador(colaborador)" class="btn btn-info pull-left">Pesquisar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="box">
+            <div class="box-header with-border">
+                <h4>Colaboradores</h4>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="">
+                    <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="example2" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="example2_info">
+                                    <thead>
+                                        <tr role="row">
+                                            <th class="col-sm-1">Código</th>
+                                            <th>Nome</th>
+                                            <th>E-mail</th>
+                                            <th class="col-sm-1">Editar</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="cola in colaboradores|itemsPerPage:15">
+                                            <!--<tr ng-repeat="cli in clientes" role="row" ng-class-odd="'odd'">-->
+                                            <td class="sorting_1">{{cola.cdfuncionario}}</td>
+                                            <td>{{cola.nmfuncionario}}</td>
+                                            <td>{{cola.dsemail}}</td>
+                                            <td >
+                                                <button type="button" class="btn btn-block btn-info" ng-click="EditarColaborador(cola.cdfuncionario)">Editar</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div style="padding-left:15px;">
+                                <dir-pagination-controls max-size="10" boundary-links="true"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+
+</section>

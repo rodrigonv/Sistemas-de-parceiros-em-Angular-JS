@@ -1,0 +1,891 @@
+﻿<script>
+    $(document).ready(function () {
+        $('.date').mask('00/00/0000');
+        $('.time').mask('00:00:00');
+        $('.date_time').mask('00/00/0000 00:00:00');
+        $('.cep').mask('00000-000');
+        $('.phone').mask('0000-0000');
+        $('.phone_with_ddd').mask('(00) 0000-0000');
+        $('.phone_us').mask('(000) 000-0000');
+        $('.mixed').mask('AAA 000-S0S');
+        $('.cpf').mask('000.000.000-00', { reverse: true });
+        $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
+        $('.money').mask('000.000.000.000.000,00', { reverse: true });
+        $('.money2').mask("#.##0,00", { reverse: true });
+        $('.ip_address').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+            translation: {
+                'Z': {
+                    pattern: /[0-9]/, optional: true
+                }
+            }
+        });
+        $('.ip_address').mask('099.099.099.099');
+        $('.percent').mask('##0,00%', { reverse: true });
+        $('.clear-if-not-match').mask("00/00/0000", { clearIfNotMatch: true });
+        $('.placeholder').mask("00/00/0000", { placeholder: "__/__/____" });
+        $('.fallback').mask("00r00r0000", {
+            translation: {
+                'r': {
+                    pattern: /[\/]/,
+                    fallback: '/'
+                },
+                placeholder: "__/__/____"
+            }
+        });
+        $('.selectonfocus').mask("00/00/0000", { selectOnFocus: true });
+
+        var options = {
+            onKeyPress: function (cpf, ev, el, op) {
+                var masks = ['000.000.000-000', '00.000.000/0000-00'],
+                    mask = (cpf.length > 14) ? masks[1] : masks[0];
+                el.mask(mask, op);
+            }
+        }
+
+        $('.cpfOuCnpj').mask('000.000.000-000', options);
+    });
+
+    $("#formcard").validate({
+        rules: {
+            bandeira: "required",
+            mes: "required",
+            ano: "required",
+            cardnumber: {
+                required: true,
+                minlength: 16,
+                maxlength: 16
+            },
+            nomeimpresso: {
+                required: true,
+                minlength: 5
+            },
+            cvv: {
+                required: true,
+                minlength: 3,
+                maxlength: 4
+            }
+        },
+        messages: {
+            bandeira: "Selecione a bandeira",
+            mes: "Informe o mes de vencimento do cartão",
+            ano: "Informe o mes de vencimento do cartão",
+            cardnumber: {
+                required: "Informe o número do cartão",
+                minlength: "O cartão deve conter 16 numeros"
+            },
+            nomeimpresso: {
+                required: "Informe o nome impresso no cartão",
+                minlength: "Nome informado muito curto"
+            },
+            cvv: {
+                required: "Informe o CVV do cartão, impresso no verso do cartão.",
+                minlength: "O CVV tem no mínimo 3 caracteres e no máximo 4",
+                maxlength: "O CVV tem no mínimo 3 caracteres e no máximo 4"
+            }
+        },
+        errorElement: "em",
+        errorPlacement: function (error, element) {
+            // Add the `help-block` class to the error element
+            error.addClass("help-block");
+
+            if (element.prop("type") === "checkbox") {
+                error.insertAfter(element.parent("label"));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-error").removeClass("has-success");
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-success").removeClass("has-error");
+        }
+    });
+
+
+</script>
+<style>
+    .checkbox.pull-right {
+        margin: 0;
+    }
+
+    .pl-ziro {
+        padding-left: 0px;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        Pedido
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Pedido</li>
+    </ol>
+</section>
+<!-- Main content -->
+<section class="content container-fluid" ng-controller="pedidoCtrl">
+    <div class="col-md-12">
+        <div class="box box-widget">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h4>Novo pedido</h4>
+                    <div class="callout callout-danger" ng-show="alerterror">
+                        <h4><i class="icon fa fa-ban"></i> Erro</h4>
+                        {{msgerror}}<br>
+                        <ul>
+                            <li ng-repeat=" err in msgerros" ng-bind-html-unsafe="err.message">
+                                {{err.message_complete}}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="callout callout-success" ng-show="alertok">
+                        <h4><i class="icon fa fa-ban"></i> Sucesso</h4>
+                        {{msgok}}
+                    </div>
+                    <div class="callout callout-info" ng-show="alertinfo">
+                        <h4><i class="icon fa fa-ban"></i> Informação</h4>
+                        {{msginfo}}
+                    </div>
+                </div>
+                <div class="box-body">
+                    <wizard name="pedidoWizard" on-finish="finishedWizard()" indicators-position="top">
+                        <wz-step wz-title="Cliente" wz-order="1" canexit="exitValidationcli" wz-disabled="{{pagamentoefetuado}}">
+                            <div class="row" style="padding-top:24px;">
+                                <hr />
+                                <div class="col-md-12">
+                                    <div class="box box-widget">
+                                        <div class="box box-info">
+                                            <div class="box-header with-border">
+                                                <h4>Pesquisar cliente</h4>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="form-body">
+                                                    <div class="form-group">
+
+                                                        <div class="col-md-5">
+                                                            <input type="text" class="form-control cpfOuCnpj" ng-model="cpfcnpjcliente" placeholder="CPF ou CNPJ do cliente" my-enter="PesquisarClientePed(nomeclienteped)">
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <input type="text" class="form-control" ng-model="nomeclienteped" placeholder="Nome do cliente" my-enter="PesquisarClientePed(nomeclienteped)">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="button" ng-click="PesquisarClientePed(nomeclienteped)" class="btn btn-info pull-left">Pesquisar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="box">
+                                        <div class="box-header with-border">
+                                            <h4>Clientes</h4>
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="">
+                                                <div id="clientegrid" class="dataTables_wrapper form-inline dt-bootstrap">
+                                                    <div class="row"><div class="col-sm-6"></div><div class="col-sm-6"></div></div><div class="row">
+                                                        <div class="col-sm-12">
+                                                            <table id="clientetbl" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="example2_info">
+                                                                <thead>
+                                                                    <tr role="row">
+                                                                        <th>Código</th>
+                                                                        <th>Nome</th>
+                                                                        <th>CPF/CNPJ</th>
+                                                                        <th>Selecionar</th>
+
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr dir-paginate="cli in clientes|itemsPerPage:10" pagination-id="cliPagination">
+                                                                        <!--<tr ng-repeat="cli in clientes" role="row" ng-class-odd="'odd'">-->
+                                                                        <td class="sorting_1">{{cli.cdentidade}}</td>
+                                                                        <td>{{cli.nome}}</td>
+                                                                        <td>{{cli.CPFCNPJ}}</td>
+                                                                        <td class="col-sm-1">
+                                                                            <button type="button" class="btn btn-block btn-info btn-sm" ng-click="SelecionarCliente(cli)">Selecionar</button>
+                                                                        </td>
+
+                                                                    </tr>
+
+                                                                </tbody>
+
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div style="padding-left:15px;">
+                                                            <dir-pagination-controls max-size="10" boundary-links="true" pagination-id="cliPagination"></dir-pagination-controls>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="box box-widget">
+                                        <div class="box box-info">
+                                            <div class="box-header with-border">
+                                                <h4>Cliente selecionado</h4>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="form-body">
+                                                    <div class="col-sm-4 invoice-col">
+                                                        <b>Nome:</b> {{clinome}}<br>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="box-footer">
+                                                <button type="submit" wz-next class="btn btn-success pull-left"><i class="fa fa-fw fa-arrow-right"></i> Produto</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </wz-step>
+                        <wz-step wz-title="Produto" wz-order="2" canexit="exitValidationprod" wz-disabled="{{pagamentoefetuado}}">
+                            <div class="row" style="padding-top:24px;">
+                                <hr />
+                                <div class="col-md-12">
+                                    <div class="box box-widget">
+                                        <div class="box box-info">
+                                            <div class="box-header with-border">
+                                                <h4>Pesquisar Produto</h4>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="form-body">
+                                                    <div class="form-group">
+
+                                                        <div class="col-md-5">
+                                                            <input type="text" class="form-control" ng-model="cdprodutobusca" placeholder="Código do produto" my-enter="PesquisarProduto(cdprodutobusca,nomeprodutobusca)" ;>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <input type="text" class="form-control" ng-model="nomeprodutobusca" placeholder="Nome do Produto" my-enter="PesquisarProduto(cdprodutobusca,nomeprodutobusca)">
+                                                        </div>
+                                                        <div class="col-sm-1">
+                                                            <button type="button" ng-click="PesquisarProduto(cdprodutobusca,nomeprodutobusca)" class="btn btn-info pull-right">Pesquisar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="box">
+                                        <div class="box-header with-border">
+                                            <h4>Produtos</h4>
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="">
+                                                <div id="produtos" class="dataTables_wrapper form-inline dt-bootstrap">
+                                                    <div class="row">
+                                                        <div class="col-sm-6"></div>
+                                                        <div class="col-sm-6"></div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <table id="produtosseltbl" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="produtos">
+                                                                <thead>
+                                                                    <tr role="row">
+                                                                        <th>Código</th>
+                                                                        <th>Nome</th>
+                                                                        <th>Estoque</th>
+                                                                        <th>Preço</th>
+                                                                        <th>Adicionar</th>
+
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr dir-paginate="prod in produtos|itemsPerPage:10" pagination-id="prdselPagination">
+                                                                        <!--<tr ng-repeat="cli in clientes" role="row" ng-class-odd="'odd'">-->
+                                                                        <td>{{prod.cdproduto}}</td>
+                                                                        <td>{{prod.nmproduto}}</td>
+                                                                        <td>{{prod.estoque}}</td>
+                                                                        <td>{{prod.precoview}}</td>
+                                                                        <td class="col-sm-1">
+                                                                            <button type="button" class="btn btn-block btn-info btn-sm" ng-click="AddCesta(prod,1)" ng-show="prod.estoque =='DISPONÍVEL'">Adicionar</button>
+                                                                        </td>
+
+                                                                    </tr>
+
+                                                                </tbody>
+
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div style="padding-left:15px;">
+                                                            <dir-pagination-controls max-size="20" boundary-links="true" pagination-id="prdselPagination"></dir-pagination-controls>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="">
+                                                <div id="produtosselecionados" class="dataTables_wrapper form-inline dt-bootstrap">
+
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <table id="produtostbl" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="produtosselecionados">
+                                                                <thead>
+                                                                    <tr role="row">
+                                                                        <th>Produto</th>
+                                                                        <th>Qtd.</th>
+                                                                        <th>Preço venda</th>
+                                                                        <th>Preço Tabela</th>
+                                                                        <!--<th>%</th>-->
+                                                                        <th>Comissão</th>
+                                                                        <th>Subtotal</th>
+                                                                        <th>Atualizar</th>
+                                                                        <th>Excluir</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr dir-paginate="cesta in cestalist|itemsPerPage:10" pagination-id="prdselecPagination">
+                                                                        <!--<tr ng-repeat="cli in clientes" role="row" ng-class-odd="'odd'">-->
+                                                                        <td>{{cesta.nomeprod}}</td>
+                                                                        <td class="col-sm-1"><input type="number" class="form-control" ng-model="cesta.quantfaturada" style="width:70px;" my-enter="AtualizaItemCesta(cesta,2);"></td>
+                                                                        <td><input type="text" class="form-control" ui-money-mask="2" ng-model="cesta.preco" style="width:100px;" my-enter="AtualizaItemCesta(cesta,2);"></td>
+                                                                        <td><span class="text-green Bold">{{cesta.precovenda | currency}}</span></td>
+                                                                        <!--<td><span class="text-green Bold">{{cesta.percentualcomissao}}</span></td>-->
+                                                                        <td><span class="text-green Bold">{{cesta.percentualcomissaocalc | currency}}</span></td>
+                                                                        <td><span class="text-green Bold">{{cesta.valortotal | currency}}</span></td>
+                                                                        <td class="col-sm-1">
+                                                                            <button type="button" class="btn btn-block btn-info" ng-click="AtualizaItemCesta(cesta,2);"> <i class="fa fa-fw fa-refresh"></i>Atualizar</button>
+                                                                        </td>
+                                                                        <td class="col-sm-1">
+                                                                            <button type="button" class="btn btn-block btn-danger" ng-click="RemoverProdutoCesta(cesta)"><i class="fa fa-fw fa-trash"></i>remover</button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <!--<td></td>-->
+                                                                        <td><span class="text-green Bold">{{ getTotalComissao() | currency}}</span></td>
+                                                                        <td><span class="text-green Bold">{{ getTotal() | currency}}</span></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </tfoot>
+
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div style="padding-left:15px;">
+                                                            <dir-pagination-controls max-size="10" boundary-links="true" pagination-id="prdselecPagination"></dir-pagination-controls>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                        <div class="box-footer">
+                                            <button type="submit" wz-previous class="btn btn-danger pull-left"><i class="fa fa-fw fa-arrow-left"></i>Cliente</button>
+                                            <button type="submit" wz-next class="btn btn-success pull-left"><i class="fa fa-fw fa-arrow-right"></i> Pedido</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </wz-step>
+                        <wz-step wz-title="Pedido" wz-order="3" canexit="exitValidationPed" wz-disabled="{{pagamentoefetuado}}">
+                            <div class="row" style="padding-top:24px;">
+                                <hr />
+                                <div class="col-md-12">
+                                    <div class="box">
+                                        <div class="box-header with-border">
+                                            <h4>Pedido</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="box box-solid">
+                                                <div class="box-header with-border">
+                                                    <h3 class="box-title">Contatos</h3>
+                                                </div>
+                                                <div class="box-body">
+                                                    <div class="">
+                                                        <div id="contatos" class="dataTables_wrapper form-inline dt-bootstrap">
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <table id="contatostbl" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="contatos">
+                                                                        <thead>
+                                                                            <tr role="row">
+                                                                                <th>Código</th>
+                                                                                <th>Nome</th>
+                                                                                <th>Tipo contato</th>
+                                                                                <th>Selecionar</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr dir-paginate="cont in contatos|itemsPerPage:5" pagination-id="contPagination">
+                                                                                <!--<tr ng-repeat="cli in clientes" role="row" ng-class-odd="'odd'">-->
+                                                                                <td>{{cont.cdcontato}}</td>
+                                                                                <td>{{cont.nmcontato}}</td>
+                                                                                <td>{{cont.nmtipocontato}}</td>
+                                                                                <td class="col-sm-1">
+                                                                                    <button type="button" class="btn btn-block btn-info btn-sm" ng-click="SelecionarContato(cont)" ng-show="!umContatoEndereco">Selecionar</button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div style="padding-left:15px;">
+                                                                    <dir-pagination-controls max-size="20" boundary-links="true" pagination-id="contPagination"></dir-pagination-controls>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="box box-solid">
+                                                <div class="box-header with-border">
+                                                    <h3 class="box-title">Endereços</h3>
+                                                </div>
+                                                <div class="box-body">
+                                                    <div class="">
+                                                        <div id="enderecocontato" class="dataTables_wrapper form-inline dt-bootstrap">
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <table id="enderecocontatotbl" class="table table-bordered table-hover dataTable table-responsive" role="grid" aria-describedby="enderecocontato">
+                                                                        <thead>
+                                                                            <tr role="row">
+                                                                                <th>Código</th>
+                                                                                <th>Cep</th>
+                                                                                <th>Uf</th>
+                                                                                <th>Cidade</th>
+                                                                                <th>Logradouro</th>
+                                                                                <th>bairro</th>
+                                                                                <th>Nº</th>
+                                                                                <th>Complemento</th>
+                                                                                <th>Selecionar</th>
+
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr dir-paginate="endcont in enderecoscontato|itemsPerPage:10" pagination-id="enderecocontatoPagination">
+                                                                                <!--<tr ng-repeat="cli in clientes" role="row" ng-class-odd="'odd'">-->
+                                                                                <td>{{endcont.cdendereco}}</td>
+                                                                                <td>{{endcont.cdcep}}</td>
+                                                                                <td>{{endcont.cduf}}</td>
+                                                                                <td>{{endcont.txcidade}}</td>
+                                                                                <td>{{endcont.txlogradouro}}</td>
+                                                                                <td>{{endcont.txbairro}}</td>
+                                                                                <td>{{endcont.txnumero}}</td>
+                                                                                <td>{{endcont.txcomplemento}}</td>
+                                                                                <td class="col-sm-1">
+                                                                                    <button type="button" class="btn btn-block btn-info" ng-click="SelecionarEnderEntrega(endcont)" ng-show="!umContatoEndereco">selecionar</button>
+                                                                                </td>
+
+                                                                            </tr>
+
+                                                                        </tbody>
+
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div style="padding-left:15px;">
+                                                                    <dir-pagination-controls max-size="10" boundary-links="true" pagination-id="enderecocontatoPagination"></dir-pagination-controls>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="box">
+                                            <div class="box-header with-border">
+                                                <h4>Modalidade de envio</h4>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div ng-repeat="moda in cotacoes track by $index" class="row-fluid">
+                                                            <label>
+                                                                <input type="radio" name="cotacao" value="{{moda.cotacao_codigo}}" class="minimal" ng-click="SelecionarModalidade(moda);" />
+                                                                &nbsp;<span ng-bind="moda.servico_nome"></span>
+                                                                &nbsp;R$ <span ng-bind="moda.cotacao_preco"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="box-footer">
+                                                <button type="submit" wz-previous class="btn btn-danger pull-left"><i class="fa fa-fw fa-arrow-left"></i>Produto</button>
+                                                <button type="submit" wz-next class="btn btn-success pull-left"><i class="fa fa-fw fa-arrow-right"></i> Pagamento</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </wz-step>
+                        <wz-step wz-title="Pagamento" wz-order="4" canexit="exitValidationPagamento" wz-disabled="{{pagamentoefetuado}}">
+                            <div class="row" style="padding-top:24px;">
+                                <hr />
+                                <div class="col-md-12">
+                                    <div class="box">
+                                        <div class="box-header with-border">
+                                            <h4>Dados do pedido</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="row no-border">
+
+                                                <div class="col-md-12">
+                                                    <div class="row invoice-info">
+                                                        <div class="col-sm-4 invoice-col">
+                                                            <h4>Endereço de entrega</h4>
+                                                            <address>
+                                                                <b>Endereço:&nbsp;</b>{{enderecocomp}}<br>
+                                                                <b>Número:&nbsp;</b>{{numerocomp}}<br>
+                                                                <b>Complemento:&nbsp;</b>{{complementocomp}}<br>
+                                                                <b>Bairro:&nbsp;</b>{{bairrocomp}}<br>
+                                                                <b>Cidade:&nbsp;</b>{{cidadecomp}}<br>
+                                                                <b>UF:&nbsp;</b>{{ufcomp}}<br>
+                                                                <b>Cep:&nbsp;</b>{{cepcomp}}<br>
+                                                            </address>
+                                                        </div>
+                                                        <div class="col-sm-4 invoice-col">
+                                                            <b>Pedido nº: &nbsp;</b>{{cdpedido}}<br>
+                                                            <b>Data do pedido:&nbsp;</b>{{datapedido}}<br>
+                                                            <b>Subtotal:&nbsp;</b>R${{subtotal}}<br>
+                                                            <b>Frete:&nbsp;</b>R${{cotacaoselValor}}<br>
+                                                            <b>Total:&nbsp;</b>R$<span class="text-green Bold">{{valortotalpedido}}</span>
+                                                        </div>
+                                                        <!-- /.col -->
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <h4>Produtos</h4>
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr role="row">
+                                                                    <th>Produto</th>
+                                                                    <th>Qtd.</th>
+                                                                    <th>Preço venda</th>
+                                                                    <th>Valor RT</th>
+                                                                    <th>Subtotal</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="cesta in cestalist" role="row">
+                                                                    <td>{{cesta.nomeprod}}</td>
+                                                                    <td class="col-sm-1">{{cesta.quantfaturada}}</td>
+                                                                    <td><span class="text-green Bold">{{cesta.preco | currency}}</span></td>
+                                                                    <td><span class="text-green Bold">{{cesta.percentualcomissaocalc | currency}}</span></td>
+                                                                    <td><span class="text-green Bold">{{cesta.valortotal | currency}}</span></td>
+                                                                </tr>
+                                                            </tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><span class="text-green Bold">{{ getTotalComissao() | currency}}</span></td>
+                                                                    <td><span class="text-green Bold">{{ getTotal() | currency}}</span></td>
+                                                                </tr>
+                                                            </tfoot>
+                                                            
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="box">
+                                        <div class="box-header with-border">
+                                            <h4>Pagamento</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="row no-border">
+                                                <div class="col-md-12">
+                                                    <div class="box box-solid">
+                                                        <div class="box-header with-border">
+                                                            <i class="fa fa-credit-card"></i>
+                                                            <h3 class="box-title">Cartão de crédito</h3>
+                                                        </div>
+                                                        <div class="box-body">
+                                                            <div class="col-md-4">
+                                                                <form role="form" name="formcard">
+                                                                    <div class="form-group">
+                                                                        <label for="cardNumber">
+                                                                            Bandeira
+                                                                        </label>
+                                                                        <div class="input-group">
+                                                                            <select class="form-control" name="bandeira" id="bandeira" ng-model="card.payment_method_id" required ng-change="updateParcelas(card.payment_method_id)" autofocus>
+                                                                                <option value=""></option>
+                                                                                <option value="3">Visa</option>
+                                                                                <option value="4">Mastercard</option>
+                                                                                <option value="2">Diners Club</option>
+                                                                                <option value="5">American Express</option>
+                                                                                <!--<option value="6">Discover</option>-->
+                                                                                <option value="16">Elo</option>
+                                                                                <option value="18">Aura</option>
+                                                                                <!--<option value="19">JCB</option>
+                                                                                <option value="20">Hipercard</option>-->
+                                                                            </select>
+                                                                            <span class="input-group-addon"><span class="fa fa-credit-card"></span></span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="input-group">
+                                                                        <select ng-model="card.split" class="form-control" name="split" id="split" ng-options="parc.parcela as parc.descricao for parc in parcelamento" ng-change="SetParcelamento(card.split)" required></select>
+                                                                        <span class="input-group-addon"><span class="glyphicon glyphicon-arrow-up"></span></span>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="cardNumber">
+                                                                            Número do cartão
+                                                                        </label>
+                                                                        <div class="input-group">
+                                                                            <input type="number" class="form-control" name="cardnumber" id="cardnumber" ng-model="card.card_number" required placeholder="Número do cartão de crédito" />
+                                                                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="cardNumber">
+                                                                            Nome impresso
+                                                                        </label>
+                                                                        <div class="input-group">
+                                                                            <input type="text" class="form-control" name="nomeimpresso" id="nomeimpresso" ng-model="card.card_name" required placeholder="Nome impresso"
+                                                                                   required />
+                                                                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="cardNumber">
+                                                                            Mês vencimento
+                                                                        </label>
+                                                                        <div class="input-group">
+                                                                            <select class="form-control" name="mes" id="mes" required ng-model="card.card_expdate_month">
+                                                                                <option value=""></option>
+                                                                                <option value="01">01</option>
+                                                                                <option value="02">02</option>
+                                                                                <option value="03">03</option>
+                                                                                <option value="04">04</option>
+                                                                                <option value="05">05</option>
+                                                                                <option value="06">06</option>
+                                                                                <option value="07">07</option>
+                                                                                <option value="08">08</option>
+                                                                                <option value="09">09</option>
+                                                                                <option value="10">10</option>
+                                                                                <option value="11">11</option>
+                                                                                <option value="12">12</option>
+                                                                            </select>
+                                                                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                                                        </div>
+                                                                        <label for="cardNumber">
+                                                                            Ano vencimento
+                                                                        </label>
+                                                                        <div class="input-group">
+                                                                            <select class="form-control" name="ano" id="ano" ng-model="card.card_expdate_year" required>
+                                                                                <option value=""></option>
+                                                                                <option value="2017">2017</option>
+                                                                                <option value="2018">2018</option>
+                                                                                <option value="2019">2019</option>
+                                                                                <option value="2020">2020</option>
+                                                                                <option value="2021">2021</option>
+                                                                                <option value="2022">2022</option>
+                                                                                <option value="2023">2023</option>
+                                                                                <option value="2024">2024</option>
+                                                                                <option value="2025">2025</option>
+                                                                                <option value="2026">2026</option>
+                                                                                <option value="2027">2027</option>
+                                                                            </select>
+                                                                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                                                        </div>
+                                                                        <label for="cardNumber">
+                                                                            CVV
+                                                                        </label>
+                                                                        <div class="input-group">
+                                                                            <input type="number" class="form-control" name="cvv" id="cvv" placeholder="CVV" ng-model="card.card_cvv" required />
+                                                                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                                                        </div>
+                                                                        <label for="cardNumber">
+                                                                            Parcelamento
+                                                                        </label>
+
+                                                                    </div>
+
+                                                                </form>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <div class="callout callout-danger" ng-show="alerterrorcard">
+                                                                    <h4><i class="icon fa fa-ban"></i> Erro</h4>
+                                                                    <ul>
+                                                                        <li ng-repeat=" err in itemserror">
+                                                                            {{err}}
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="box-footer">
+                                                            <button type="submit" wz-next class="btn btn-success btn-lg pull-left" ng-disabled="pagamentoclicado"><i class="fa fa-fw fa-money"></i>Pagar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="col-md-4">
+                                                    <div class="box box-solid">
+                                                        <div class="box-header with-border">
+                                                            <i class="fa fa-barcode"></i>
+                                                            <h3 class="box-title">Boleto</h3>
+                                                        </div>
+                                                        <div class="box-body">
+                                                            <img src="../dist/img/boleto.png" /><br />
+                                                            <div class="form-group">
+                                                                <div class="radio">
+                                                                    <label>
+                                                                        <input type="radio" name="pagamento" ng-click="SelecioanarForma('boleto')">
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>-->
+                                                <!--<div class="col-md-6">
+                                                    <div class="box box-solid">
+                                                        <div class="box-header with-border">
+                                                            <i class="fa fa-exchange"></i>
+                                                            <h3 class="box-title"> Transferência bancária</h3>
+                                                        </div>
+                                                        <div class="box-body">
+                                                            <img src="../dist/img/transferencia.png" /><br />
+                                                            <div class="form-group">
+                                                                <div class="radio">
+                                                                    <label>
+                                                                        <input type="radio" name="pagamento" ng-click="SelecioanarForma('transferencia')" ng-disabled="pagamentoclicado">
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>-->
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </wz-step>
+                        <wz-step wz-title="Resumo" wz-order="5">
+                            <div class="row" style="padding-top:24px;">
+                                <hr />
+                                <div class="col-md-12">
+                                    <div class="box">
+                                        <div class="box-header with-border">
+                                            <h4>Resumo</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="row no-border">
+                                                <div class="col-lg-11" ng-show="!retornoprocessado">
+                                                    <label>Processando as informações.....</label>
+                                                </div>
+                                                <section class="invoice" ng-show="retornoprocessado">
+                                                    <!-- title row -->
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <h2 class="page-header">
+                                                                Recibo da transação
+                                                                
+                                                            </h2>
+                                                        </div>
+                                                        <!-- /.col -->
+                                                    </div>
+                                                    <!-- info row -->
+                                                    <div class="row invoice-info">
+                                                        
+                                                        <div class="col-sm-4 invoice-col">
+                                                            Endereço de entrega
+                                                            <address>
+                                                                <b>Endereço:&nbsp;</b>{{enderecocomp}}<br>
+                                                                <b>Número:&nbsp;</b>{{numerocomp}}<br>
+                                                                <b>Complemento:&nbsp;</b>{{complementocomp}}<br>
+                                                                <b>Bairro:&nbsp;</b>{{bairrocomp}}<br>
+                                                                <b>Cidade:&nbsp;</b>{{cidadecomp}}<br>
+                                                                <b>UF:&nbsp;</b>{{ufcomp}}<br>
+                                                                <b>Cep:&nbsp;</b>{{cepcomp}}<br>
+                                                            </address>
+                                                        </div>
+                                                        <!-- /.col -->
+                                                        <!-- /.col -->
+                                                        <div class="col-sm-4 invoice-col">
+                                                            <b>Pedido nº: &nbsp;</b>{{cdpedido}}<br>
+                                                            <b>Data do pedido:&nbsp;</b>{{datapedido}}<br>
+                                                            <b>Subtotal:&nbsp;</b>R${{subtotal}}<br>
+                                                            <b>Frete:&nbsp;</b>R${{cotacaoselValor}}<br>
+                                                            <b>Pagamento:&nbsp;</b>{{splitpagamento}}<br>
+                                                            <b>Total:&nbsp;</b>R$<span class="text-green Bold">{{valortotalpedido}}</span>
+                                                        </div>
+                                                        <!-- /.col -->
+                                                    </div>
+                                                    <!-- /.row -->
+                                                    <!-- Table row -->
+                                                    <div class="row">
+                                                        <div class="col-xs-12 table-responsive">
+                                                            <div class="table-responsive">
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr role="row">
+                                                                            <th>Produto</th>
+                                                                            <th>Qtd.</th>
+                                                                            <th>Preço venda</th>
+                                                                            <th>Subtotal</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr ng-repeat="cesta in cestalist" role="row">
+                                                                            <td>{{cesta.nomeprod}}</td>
+                                                                            <td class="col-sm-1">{{cesta.quantfaturada}}</td>
+                                                                            <td><span class="text-green Bold">{{cesta.preco | currency}}</span></td>
+                                                                            <td><span class="text-green Bold">{{cesta.valortotalview}}</span></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                    <tfoot>
+                                                                        <tr>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td><span class="text-green Bold">{{ getTotal() | currency}}</span></td>
+                                                                        </tr>
+                                                                    </tfoot>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <!-- /.col -->
+                                                    </div>
+
+                                                </section>
+                                            </div>
+                                        </div>
+                                        <div class="box-footer">
+                                            <button type="button" class="btn btn-success pull-left"><i class="fa fa-fw fa-arrow-left"></i>Novo Pedido</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </wz-step>
+                    </wizard>
+                </div>
+                <div class="box-footer">
+                    <!--<button type="button" ng-click="PesquisarCliente()" class="btn btn-info pull-right">Proximo</button>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

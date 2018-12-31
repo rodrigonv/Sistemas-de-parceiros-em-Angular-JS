@@ -1,0 +1,6 @@
+E:\_REPOSITORIO\Optimus\Optimus.Web.UI.Parceiros\bin\Optimus.Web.UI.Parceiros.dll.config
+E:\_REPOSITORIO\Optimus\Optimus.Web.UI.Parceiros\bin\Optimus.Web.UI.Parceiros.dll
+E:\_REPOSITORIO\Optimus\Optimus.Web.UI.Parceiros\bin\Optimus.Web.UI.Parceiros.pdb
+E:\_REPOSITORIO\Optimus\Optimus.Web.UI.Parceiros\obj\Release\Optimus.Web.UI.Parceiros.csprojResolveAssemblyReference.cache
+E:\_REPOSITORIO\Optimus\Optimus.Web.UI.Parceiros\obj\Release\Optimus.Web.UI.Parceiros.dll
+E:\_REPOSITORIO\Optimus\Optimus.Web.UI.Parceiros\obj\Release\Optimus.Web.UI.Parceiros.pdb

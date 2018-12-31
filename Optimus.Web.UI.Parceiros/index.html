@@ -1,0 +1,336 @@
+﻿<!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
+<html>
+<head>
+    <base href="/" />
+    <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Multivisi - Parceiros</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="dist/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
+    <link href="plugins/iCheck/all.css" rel="stylesheet" />
+    <link href="plugins/datepicker/datepicker3.css" rel="stylesheet" />
+
+    <!-- Syncfusion -->
+    <link href="dist/syncfusion/ejthemes/bootstrap-theme/ej.web.all.min.css" rel="stylesheet" />
+    <link href="dist/syncfusion/ejthemes/responsive-css/ej.responsive.css" rel="stylesheet" />
+    <link href="dist/syncfusion/ejthemes/ej.widgets.core.bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .marginmenu {
+            /*margin-left: 230px !important;*/
+        }
+        .nomarginmenu {
+            margin-left: 0px !important;
+        }
+        .vcenter {
+            display: inline-block;
+            vertical-align: middle;
+            float: none;
+        }
+        .trselect {
+            background-color: #819FF7;
+        }
+        #loading-bar {
+            pointer-events: all !important;
+            z-index: 99999 !important;
+            border: none !important;
+            margin: 0px !important;
+            padding: 0px !important;
+            width: 100% !important;
+            height: 100% !important;
+            top: 0px !important;
+            left: 0px !important;
+            cursor: wait !important;
+            position: fixed !important;
+            background-color: rgba(0, 0, 0, 0.6) !important;
+        }
+
+
+        @media only screen and (max-width: 800px) {
+
+            /* Force table to not be like tables anymore */
+            #no-more-tables table,
+            #no-more-tables thead,
+            #no-more-tables tbody,
+            #no-more-tables tfoot,
+            #no-more-tables th,
+            #no-more-tables td,
+            #no-more-tables tr {
+                display: block;
+            }
+
+                /* Hide table headers (but not display: none;, for accessibility) */
+                #no-more-tables thead tr {
+                    position: absolute;
+                    top: -9999px;
+                    left: -9999px;
+                }
+
+            #no-more-tables tr {
+                border: 1px solid #ccc;
+            }
+
+            #no-more-tables td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                white-space: normal;
+                text-align: left;
+            }
+
+                #no-more-tables td:before {
+                    /* Now like a table header */
+                    position: absolute;
+                    /* Top/left values mimic padding */
+                    top: 6px;
+                    left: 6px;
+                    width: 45%;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                    text-align: left;
+                    font-weight: bold;
+                }
+
+                /*
+	Label the data
+	*/
+                #no-more-tables td:before {
+                    content: attr(data-title);
+                }
+                
+        }
+
+
+    </style>
+   
+    <link href="plugins/angular/angular-wizard.min.css" rel="stylesheet" />
+    <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
+          page. However, you can choose any other skin. Make sure you
+          apply the skin class to the body tag so the changes take effect. -->
+    <link href="plugins/angular/loading-bar.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="dist/css/skins/skin-blue.min.css">
+    <link href="plugins/flexslider/flexslider.css" rel="stylesheet" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+</head>
+<!--
+BODY TAG OPTIONS:
+=================
+Apply one or more of the following classes to get the
+desired effect
+|---------------------------------------------------------|
+| SKINS         | skin-blue                               |
+|               | skin-black                              |
+|               | skin-purple                             |
+|               | skin-yellow                             |
+|               | skin-red                                |
+|               | skin-green                              |
+|---------------------------------------------------------|
+|LAYOUT OPTIONS | fixed                                   |
+|               | layout-boxed                            |
+|               | layout-top-nav                          |
+|               | sidebar-collapse                        |
+|               | sidebar-mini                            |
+|---------------------------------------------------------|
+-->
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper" ng-app="optimusPartner" ng-controller="mainCtrl" ng-cloak>
+        <!-- Main Header -->
+        <header class="main-header">
+            <!-- Logo -->
+            <div class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini">
+                    <img src="dist/img/multivisi50.png" />
+                </span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg">
+                    <img src="dist/img/multivisi.png" />
+                </span>
+            </div>
+            <!-- Header Navbar -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <a href="" class="sidebar-toggle" data-toggle="push-menu" role="button" ng-show="isUserlogado()">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+                <!-- Navbar Right Menu -->
+                <div class="navbar-custom-menu" ng-show="isUserlogado()">
+                    <ul class="nav navbar-nav">
+
+                        <li class="dropdown user user-menu">
+                            <!-- Menu Toggle Button -->
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <!-- The user image in the navbar-->
+                                <i class="fa fa-user text-aqua"></i>
+                                <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                                <span class="hidden-xs">{{usernamelogado}}</span>
+                            </a>
+
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar" ng-show="isUserlogado()">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li class="header">Menu</li>
+                    <!-- Optionally, you can add icons to the links -->
+                    <li class=""><a href="index"><i class="fa fa-home"></i> <span>Home</span></a></li>
+                    <li class="treeview active">
+                        <a href="#">
+                            <i class="fa fa-shopping-cart"></i> <span>Pedidos</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="/NovoPedido"><i class="fa fa-file-o"></i>Novo pedido</a></li>
+                            <li><a href="/PesquisarPedido"><i class="fa fa-search-plus"></i>Consultar pedidos</a></li>
+                        </ul>
+                    </li>
+                    <li class=""><a href="/PesquisarCliente"><i class="fa fa-users"></i> <span>Clientes</span></a></li>
+                    <li class=""><a href="/PesquisarColaborador"><i class="fa fa-user"></i> <span>Colaboradores</span></a></li>
+                    <li class=""><a href="/PesquisarComissao"><i class="fa fa-line-chart"></i> <span>Comissão</span></a></li>
+                    <li class="" ng-show="isAdm()"><a href="/Gerencial"><i class="fa fa-building-o"></i> <span>Gerencial</span></a></li>
+                    
+
+                    <li class=""><a href="/EnviarNf"><i class="fa fa-table"></i> <span>Nota fiscal</span></a></li>
+                    <li class=""><a href="/TabelaPreco"><i class="fa fa-list"></i> <span>Tabela de preços</span></a></li>
+                    <li class="" ng-show="isAdm()"><a href="/PesquisarBanner"><i class="fa fa-newspaper-o"></i> <span>Banner</span></a></li>
+                    <li class="" ng-show="isAdm()"><a href="/CadastroProdutoParceiro"><i class="fa fa-industry"></i> <span>Produtos Parceiro</span></a></li>
+                    <!--<li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-shopping-cart"></i> <span>Relatórios</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="#">Pedidos emitidos </a></li>
+                            <li><a href="#">Comissao</a></li>
+                        </ul>
+                    </li>-->
+                    <!--<li class=""><a href="#/"><i class="fa fa-bell-o"></i><span class="label label-warning">10</span> <span>Notificação</span></a></li>-->
+                    <li class=""><a href="#" ng-click="logoff()"><i class="fa fa-sign-out"></i><span>Sair</span></a></li>
+                </ul>
+                <!-- /.sidebar-menu -->
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper" ng-class="{marginmenu: isUserlogado(), nomarginmenu: !isUserlogado()}">
+            <!-- Content Header (Page header) -->
+
+            <ng-view></ng-view>
+            <!--------------------------
+            | Your Page Content Here |
+            -------------------------->
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <!-- Main Footer -->
+        <!--<footer class="main-footer">
+
+            <div class="pull-right hidden-xs">
+
+            </div>
+
+            <h6>Optimus Tecnologia e Sistemas &copy;2017</h6>
+        </footer>-->
+        <!-- Control Sidebar -->
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed
+        immediately after the control sidebar -->
+        <div class="control-sidebar-bg"></div>
+    </div>
+    <!-- ./wrapper -->
+    <!-- REQUIRED JS SCRIPTS -->
+    <!-- jQuery 3.1.1 -->
+    <script src="plugins/moment.min.js"></script>
+    <script src="plugins/jQuery/jquery-3.1.1.min.js"></script>
+    <script src="plugins/jQuery/jquery.mask.min.js"></script>
+    <script src="plugins/flexslider/jquery.flexslider.js"></script>
+    
+    <!-- Bootstrap 3.3.7 -->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="plugins/datepicker/bootstrap-datepicker.js"></script>
+    <script src="plugins/datepicker/locales/bootstrap-datepicker.pt-BR.js"></script>
+
+    <script src="plugins/input-mask/jquery.inputmask.js"></script>
+    <script src="plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+    <script src="plugins/input-mask/jquery.inputmask.extensions.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <script src="plugins/angular/angular.js"></script>
+    <script src="plugins/angular/angular-route.js"></script>
+    <script src="plugins/angular/angular-ui-router.js"></script>
+    <script src="plugins/angular/ngStorage.min.js"></script>
+
+    <script src="dist/js/app.js"></script>
+    <script src="dist/js/services.js"></script>
+    <script src="dist/js/controllers.js"></script>
+    <script src="dist/js/routes.js"></script>
+    <script src="dist/js/directive.js"></script>
+    <script src="plugins/angular/angular-wizard.js"></script>
+    <script src="plugins/fastclick/fastclick.js"></script>
+    <script src="plugins/sparkline/jquery.sparkline.min.js"></script>
+    <script src="plugins/slimScroll/jquery.slimscroll.min.js"></script>
+    <script src="plugins/angular/loading-bar.min.js"></script>
+    <script src="plugins/angular/angular-locale_pt-br.js"></script>
+    <script src="plugins/angular/angular_masks.js"></script>
+
+    <script src="plugins/angular/ng-file-upload-shim.js"></script>
+    <script src="plugins/angular/ng-file-upload.js"></script>
+
+    <script src="dist/js/demo.js"></script>
+    <script src="dist/js/dirPagination.js"></script>
+    <script src="plugins/iCheck/icheck.min.js"></script>
+    <script src="plugins/jQuery/jquery.validate.js"></script>
+    <script src="plugins/jQuery/additional-methods.js"></script>
+    <script src="plugins/jQuery/messages_pt_BR.js"></script>
+    <script src="bootstrap/js/ui-bootstrap.js"></script>
+    <script src="bootstrap/js/ui-bootstrap-tpls.js"></script>
+    <script src="plugins/lodash/lodash.core.min.js"></script>
+    <script src="plugins/lodash/lodash.min.js"></script>
+
+    <script src="plugins/html2canvas/html2canvas.js"></script>
+    <script src="plugins/pdfmake/pdfmake.js"></script>
+    <script src="plugins/pdfmake/vfs_fonts.js"></script>
+
+    <!-- Syncfusion -->
+    <script src="dist/syncfusion/scripts/ej.web.all.min.js"></script>
+    <script src="dist/syncfusion/scripts/ej.widget.angular.min.js"></script>
+    <script src="dist/syncfusion/scripts/ej.unobtrusive.min.js"></script>
+    <script src="dist/syncfusion/scripts/cultures/ej.culture.en-US.min.js"></script>
+    <!-- Optionally, you can add Slimscroll and FastClick plugins.
+         Both of these plugins are recommended to enhance the
+         user experience. -->
+</body>
+</html>
